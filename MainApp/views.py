@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from MainApp.models import Snippet
 from MainApp.forms import SnippetForm
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib import auth
+
 
 
 def index_page(request):
@@ -28,7 +30,10 @@ def add_snippet_page(request):
         #snippet = Snippet(name=name, lang=lang, code=code)
         #snippet.save()
         if form.is_valid():
-            form.save()
+            snippet = form.save(commit=False)
+            if request.user.is_authenticated:
+                snippet.user = request.user
+                snippet.save()
             return redirect('snippets-list')
         return render(request, 'pages/add_snippet.html', {'form': form})
 
@@ -81,4 +86,20 @@ def snippet_edit(request, snippet_id):
         snippet.creation_date = form_data["creation_date"]
         snippet.save()
         return redirect('snippets-list')
-    
+
+def login(request):
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = auth.authenticate(request, username=username, password=password)
+        if user is not None:
+            auth.login(request, user)
+        else:
+            pass
+    return redirect('home')
+
+
+def logout(request):
+    auth.logout(request)
+    return redirect(request.META.get('HTTP_REFERER', '/')) 
+
