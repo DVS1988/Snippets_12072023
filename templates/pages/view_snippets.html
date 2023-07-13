@@ -37,20 +37,18 @@
                         <td scope="row">{{ snippet.id }}</td>
                         <td>
                             <a href="{% url 'snippet-detail' snippet.id %}">{{ snippet.name }}</a>
+                            {% if request.user == snippet.user %}
                             <a href="{% url 'snippet-delete' snippet.id %}">
                                 <i style="color: red "class=" fa-sharp fa-solid fa-trash"></i> 
                             </a>
                             <a href="{% url 'snippet-edit' snippet.id %}">
                                 <i style="color: red "class=" fas fa-edit"></i> 
                             </a>
+                            {% endif %}
                         </td>
                         <td>{{ snippet.creation_date }}</td>
                         <td>{{ snippet.user.username }}</td>
-                        {% if snippet.public %}
-                        <td>Публичный</td>
-                        {% else %}
-                        <td>Приватный</td>
-                        {% endif %}
+                        <td>{{ snippet.public }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
